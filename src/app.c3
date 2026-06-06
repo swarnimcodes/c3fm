@@ -9,6 +9,21 @@ struct AppState {
   String log;
 }
 
+// i am thinking something like
+// this functions should be called when there is a change in the cwd
+// since entries and log are dependent properties on cwd change,
+// we ought to re-compute and reconcile the state
+// the allocation, marking and reset stay in this function instead of
+// 'n' number of places
+// thats why i feel this function should exist
+fn void? c3fm_recompute_state(ArenaAllocator* allocator, AppState* state) {
+  sz mark = allocator.mark();
+  path::chdir(state.cwd)!;
+  state.entries = path::ls(allocator, state.cwd)!;
+  state.highlighted = 0;
+  allocator.reset(mark);
+}
+
 fn AppState? c3fm_init(ArenaAllocator* allocator) {
   Path cwd = path::cwd(allocator)!;
   path::chdir(cwd)!!;
@@ -39,13 +54,8 @@ fn bool c3fm_handle_key(ArenaAllocator *allocator, AppState *state, Key key) {
 
     if (path::is_dir(current_highlighted_abs_path)) {
       state.log = "dir";
-      state.highlighted = 0;
       state.cwd = current_highlighted_abs_path;
-      path::chdir(state.cwd) !!;
-      typeof(allocator);
-      sz mark = allocator.mark();
-      state.entries = path::ls(allocator, state.cwd) !!;
-      allocator.reset(mark);
+      c3fm_recompute_state(allocator, state)!!;
     } else if (path::is_file(current_highlighted_abs_path)) {
       state.log = "file";
     } else {
@@ -53,11 +63,8 @@ fn bool c3fm_handle_key(ArenaAllocator *allocator, AppState *state, Key key) {
     }
 
   case BACK:
-    path::chdir("..")!!;
-    sz mark = allocator.mark();
-    state.cwd = path::cwd(allocator)!!;
-    state.entries = path::ls(allocator, state.cwd)!!;
-    allocator.reset(mark);
+    state.cwd = state.cwd.parent()!!;
+    c3fm_recompute_state(allocator, state)!!;
   default:
   }
   return false;
