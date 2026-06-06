@@ -9,7 +9,7 @@ struct AppState {
   String log;
 }
 
-fn AppState? c3fm_init(Allocator allocator) {
+fn AppState? c3fm_init(ArenaAllocator* allocator) {
   Path cwd = path::cwd(allocator)!;
   path::chdir(cwd)!!;
   PathList entries = path::ls(allocator, cwd)!;
