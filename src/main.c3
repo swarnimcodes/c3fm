@@ -26,11 +26,10 @@ fn int main(String[] args) {
   while (true) {
     render(&state);
 
-    Key key = terminal_read_key()!!;
-    if (c3fm_handle_key(&state, key)) break;
+    Key key = terminal_read_key(&state)!!;
+    if (c3fm_handle_key(&arena, &state, key)) break;
   }
 
-  //
   arena.clear();
   return 0;
 }

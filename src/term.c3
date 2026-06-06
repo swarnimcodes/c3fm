@@ -12,6 +12,7 @@ enum Key {
   UP,
   DOWN,
   ENTER,
+  BACK
 }
 
 struct Terminal {
@@ -32,7 +33,7 @@ fn void terminal_deinit(Terminal* terminal) {
 }
 
 
-fn Key? terminal_read_key() {
+fn Key? terminal_read_key(AppState* state) {
   char c;
   sz n = libc::read(libc::STDIN_FD, &c, 1);
 
@@ -52,9 +53,16 @@ fn Key? terminal_read_key() {
 
   case '\n':
   case '\r':
+  case 'l':
     return ENTER;
 
+  case 'h':
+    return BACK;
+
   default:
+  io::printn(c);
+  String temp_log = string::tformat("%s", c); // uses temp allocator under the hood afaik
+    state.log = temp_log;
     return UNKNOWN;
   }
 }
