@@ -12,9 +12,9 @@ fn void render(AppState* state)
 
   foreach (i, entry : state.entries) {
       if (i == state.highlighted) {
-        io::printfn("%s%s%s %s%s", Ansi.BG_CYAN, Ansi.BOLD, Ansi.BRIGHT_BLACK, (String)entry, Ansi.RESET);
+        io::printfn("%s%s%s %s%s  ", Ansi.BG_CYAN, Ansi.BOLD, Ansi.BRIGHT_BLACK, (String)entry, Ansi.RESET);
       } else {
-        io::printfn(" %s", (String)entry);
+        io::printfn(" %s  ", (String)entry);
       }
   }
 
