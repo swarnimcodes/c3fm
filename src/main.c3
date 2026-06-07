@@ -2,34 +2,36 @@ module c3fm;
 import std::io;
 import std::io::path;
 
-macro void typeof(thing) {
-  io::printfn("Type: %s", $Typeof(thing)::name);
-  return;
+macro void typeof(thing)
+{
+	io::printfn("Type: %s", $Typeof(thing)::name);
+	return;
 }
 
-fn int main(String[] args) {
+fn int main(String[] args)
+{
+	(void)args;
 
-  (void)args;
+	// arena allocator
+	char[4096] arena_storage;
+	ArenaAllocator arena;
 
-  // arena allocator
-  char[4096] arena_storage;
-  ArenaAllocator arena;
+	arena.init(&arena_storage);
 
-  arena.init(&arena_storage);
+	AppState state = c3fm_init(&arena)!!;
 
-  AppState state = c3fm_init(&arena)!!;
+	Terminal terminal;
+	terminal_init(&terminal)!!;
+	defer terminal_deinit(&terminal);
 
-  Terminal terminal;
-  terminal_init(&terminal)!!;
-  defer terminal_deinit(&terminal);
+	while (true)
+	{
+		render(&state);
 
-  while (true) {
-    render(&state);
+		Key key = terminal_read_key(&state)!!;
+		if (c3fm_handle_key(&arena, &state, key)) break;
+	}
 
-    Key key = terminal_read_key(&state)!!;
-    if (c3fm_handle_key(&arena, &state, key)) break;
-  }
-
-  arena.clear();
-  return 0;
+	arena.clear();
+	return 0;
 }
