@@ -6,6 +6,8 @@ Terminal based file manager in [c3](https://c3-lang.org/)
 ## Features
 
 - [x] basic directory traversal
+- [x] back and forth lwd memory
+- [.] stringed keybindings system
 - [ ] three pane mode
 - [ ] parent directory in left split pane
 - [ ] file visualization in right pane
